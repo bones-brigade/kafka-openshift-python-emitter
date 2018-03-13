@@ -10,7 +10,7 @@ variables.
 ```
 oc new-app centos/python-27-centos7~https://github.com/bones-brigade/kafka-openshift-python-emitter \
   -e KAFKA_BROKERS=kafka:9092 \
-  -e SOURCE_URL=https://www.gutenberg.org/files/11/11-0.txt
+  -e SOURCE_URI=https://www.gutenberg.org/files/11/11-0.txt
 ```
 
 This will launch the emitter using the default topic of `bones-brigade` and
