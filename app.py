@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 import time
-import urllib
+import urllib.request as urllib
 
 from kafka import KafkaProducer
 
@@ -22,7 +22,7 @@ def main(args):
 
     logging.info('sending lines')
     for line in sourcefile.readlines():
-        producer.send(args.topic, line)
+        producer.send(args.topic, line.encode())
         time.sleep(1.0 / args.rate)
     logging.info('finished sending source')
 
