@@ -42,7 +42,7 @@ def parse_args(parser):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    logging.info('starting kafka-openshift-python emitter')
+    logging.info('starting kafka-python emitter')
     parser = argparse.ArgumentParser(description='emit some stuff on kafka')
     parser.add_argument(
             '--brokers',
