@@ -8,7 +8,7 @@ variables.
 ## Launching on OpenShift
 
 ```
-oc new-app centos/python-36-centos7~https://github.com/bones-brigade/kafka-openshift-python-emitter \
+oc new-app centos/python-36-centos7~https://gitlab.com/bones-brigade/kafka-python-emitter \
   -e KAFKA_BROKERS=kafka:9092 \
   -e KAFKA_TOPIC=bones-brigade \
   -e SOURCE_URI=https://www.gutenberg.org/files/11/11-0.txt \
