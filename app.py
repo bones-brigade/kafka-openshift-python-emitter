@@ -3,6 +3,7 @@ import importlib.machinery as importlib
 import logging
 import os
 import time
+import types
 import urllib.request as urllib
 
 from kafka import KafkaProducer
@@ -31,7 +32,7 @@ def main(args):
             logging.info(args.userfunction)
             dl = urllib.urlretrieve(args.userfunction)[0]
             loader = importlib.SourceFileLoader('userfunction', dl)
-            userfunction = pytypes.ModuleType(loader.name)
+            userfunction = types.ModuleType(loader.name)
             loader.exec_module(userfunction)
             emitter_function = userfunction.user_defined_function
             logging.info('user function loaded')
