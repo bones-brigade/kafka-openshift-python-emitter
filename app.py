@@ -37,15 +37,21 @@ def main(args):
         except Exception as e:
             logging.error('failed to import user function file')
             logging.error(e)
-            emitter_function = external_file_generator
+            emitter_function = None
+    else:
+        logging.info(
+                'no user function specified, using external file generator')
+        emitter_function = external_file_generator
 
     logging.info('creating kafka producer')
     producer = KafkaProducer(bootstrap_servers=args.brokers)
 
     logging.info('beginning producer loop')
-    for i in emitter_function(args):
-        producer.send(args.topic, i.encode())
-        time.sleep(1.0 / args.rate)
+    if emitter_function is not None:
+        for i in emitter_function(args):
+            producer.send(args.topic, i.encode())
+            time.sleep(1.0 / args.rate)
+    logging.info('ending producer loop')
 
 
 def get_arg(env, default):
