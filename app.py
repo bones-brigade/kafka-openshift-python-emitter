@@ -7,24 +7,29 @@ import urllib.request as urllib
 from kafka import KafkaProducer
 
 
+def external_file_generator(args):
+    logging.info('downloading source')
+    dl = urllib.urlretrieve(args.source)
+    sourcefile = open(dl[0])
+    logging.info('sending lines')
+    for line in sourcefile.readlines():
+        yield line
+    logging.info('finished sending source')
+
+
 def main(args):
     logging.info('brokers={}'.format(args.brokers))
     logging.info('topic={}'.format(args.topic))
     logging.info('rate={}'.format(args.rate))
     logging.info('source={}'.format(args.source))
 
-    logging.info('downloading source')
-    dl = urllib.urlretrieve(args.source)
-    sourcefile = open(dl[0])
-
     logging.info('creating kafka producer')
     producer = KafkaProducer(bootstrap_servers=args.brokers)
 
-    logging.info('sending lines')
-    for line in sourcefile.readlines():
-        producer.send(args.topic, line.encode())
+    logging.info('beginning producer loop')
+    for i in external_file_generator(args):
+        producer.send(args.topic, i.encode())
         time.sleep(1.0 / args.rate)
-    logging.info('finished sending source')
 
 
 def get_arg(env, default):
