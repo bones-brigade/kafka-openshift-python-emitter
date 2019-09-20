@@ -23,11 +23,27 @@ def main(args):
     logging.info('rate={}'.format(args.rate))
     logging.info('source={}'.format(args.source))
 
+    # if a user function is specified, download it and import it
+    if args.userfunction is not None:
+        try:
+            logging.info('downloading user function')
+            logging.info(args.userfunction)
+            dl = urllib.urlretrieve(args.userfunction)[0]
+            loader = importlib.SourceFileLoader('userfunction', dl)
+            userfunction = pytypes.ModuleType(loader.name)
+            loader.exec_module(userfunction)
+            emitter_function = userfunction.user_defined_function
+            logging.info('user function loaded')
+        except Exception as e:
+            logging.error('failed to import user function file')
+            logging.error(e)
+            emitter_function = external_file_generator
+
     logging.info('creating kafka producer')
     producer = KafkaProducer(bootstrap_servers=args.brokers)
 
     logging.info('beginning producer loop')
-    for i in external_file_generator(args):
+    for i in emitter_function(args):
         producer.send(args.topic, i.encode())
         time.sleep(1.0 / args.rate)
 
@@ -42,6 +58,7 @@ def parse_args(parser):
     args.topic = get_arg('KAFKA_TOPIC', args.topic)
     args.rate = get_arg('RATE', args.rate)
     args.source = get_arg('SOURCE_URI', args.source)
+    args.userfunction = get_arg('USER_FUNCTION_URI', args.userfunction)
     return args
 
 
@@ -65,6 +82,11 @@ if __name__ == '__main__':
     parser.add_argument(
             '--source',
             help='The source URI for data to emit, env variable SOURCE_URI')
+    parser.add_argument(
+            '--user-function',
+            dest='userfunction',
+            help='URI to a user function .py file, env variable '
+            'USER_FUNCTION_URI')
     args = parse_args(parser)
     main(args)
     logging.info('exiting')
